@@ -18,17 +18,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3  # Configure Node.js
         with:
-          node-version: '16'  # Choix de la version de Node.js (peut être ajusté si nécessaire)
+          node-version: '16'  # Choix de la version de Node.js
 
       - name: Install dependencies
-        run: npm install  # Installe les dépendances depuis le fichier package.json
+        run: npm ci --cache .npm --prefer-offline  # Utilise npm ci pour installer les dépendances avec un cache
 
-  validate:
-    runs-on: ubuntu-latest  # Utilisation de la machine virtuelle Ubuntu pour l'étape de validation
-    needs: install  # L'étape "validate" attend la fin de l'étape "install"
+  lint:
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de lint
+    needs: install  # L'étape "lint" attend la fin de l'étape "install"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
 
       - name: Lint code (ESLint)
-        run: npm run lint  # Exécute la commande "npm run lint" définie dans package.json, qui appelle ESLint
+        run: npm run lint  # Exécute la commande "npm run lint" définie dans package.json
