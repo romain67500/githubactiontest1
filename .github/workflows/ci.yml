@@ -1,0 +1,24 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3  # Checkout le code source
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Utilise Node.js version 16 (ou une autre version selon ton projet)
+      - name: Install dependencies
+        run: npm install  # Installe les dépendances via npm
+      - name: Run tests
+        run: npm test  # Exécute les tests de ton projet (ajuste selon ton script de test)
