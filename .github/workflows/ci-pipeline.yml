@@ -32,3 +32,13 @@ jobs:
 
       - name: Lint code (ESLint)
         run: npm run lint  # Exécute la commande "npm run lint" définie dans package.json
+
+  unit-test:
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de tests
+    needs: install  # L'étape "unit-test" attend la fin de l'étape "install"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
+
+      - name: Run unit tests with Vitest
+        run: npm test  # Exécute la commande "npm test" pour lancer les tests avec Vitest
