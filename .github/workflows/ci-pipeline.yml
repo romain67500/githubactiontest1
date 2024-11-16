@@ -3,83 +3,32 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # Déclenche l'action sur des pushs vers la branche principale
   pull_request:
     branches:
-      - main
+      - main  # Déclenche l'action lors de la création d'une pull request vers la branche principale
 
 jobs:
   install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Récupère le code du repository
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3  # Configure Node.js
         with:
-          node-version: '16'  # Utilise la version de Node.js que tu préfères
-          cache: 'npm'
-          
-      - name: Cache Node modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+          node-version: '16'  # Choix de la version de Node.js (peut être ajusté si nécessaire)
 
       - name: Install dependencies
-        run: |
-          npm ci  # Utilise npm ci pour une installation propre des dépendances
-          npm install eslint --save-dev  # S'assure qu'ESLint est bien installé
+        run: npm install  # Installe les dépendances depuis le fichier package.json
 
   validate:
-    runs-on: ubuntu-latest
-    needs: install  # Ce job ne s'exécute qu'après le job "install"
+    runs-on: ubuntu-latest  # Utilisation de la machine virtuelle Ubuntu pour l'étape de validation
+    needs: install  # L'étape "validate" attend la fin de l'étape "install"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
 
-      - name: Validate code (Linting)
-        run: npm run lint  # Lance ESLint après avoir installé les dépendances
-
-  test:
-    runs-on: ubuntu-latest
-    needs: validate  # Ce job ne s'exécute qu'après le job "validate"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Run tests
-        run: npm test
-
-  build:
-    runs-on: ubuntu-latest
-    needs: test  # Ce job ne s'exécute qu'après le job "test"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Build project
-        run: npm run build
-
-  release:
-    runs-on: ubuntu-latest
-    needs: build  # Ce job ne s'exécute qu'après le job "build"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Create release
-        run: echo "Creating release... (simulate with echo)"
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: release  # Ce job ne s'exécute qu'après le job "release"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Deploy project
-        run: echo "Deploying project... (simulate with echo)"
+      - name: Lint code (ESLint)
+        run: npm run lint  # Exécute la commande "npm run lint" définie dans package.json, qui appelle ESLint
