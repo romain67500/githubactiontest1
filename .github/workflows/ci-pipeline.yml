@@ -42,3 +42,26 @@ jobs:
 
       - name: Run unit tests with Vitest
         run: npm test  # Exécute la commande "npm test" pour lancer les tests avec Vitest
+
+  release:
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de release
+    needs: [lint, unit-test]  # Cette étape attend la fin des étapes "lint" et "unit-test"
+    if: github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'chore: release')  # Vérifie la branche et le message du dernier commit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Récupère le code pour préparer la release
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3  # Configure Node.js
+        with:
+          node-version: '16'  # Choix de la version de Node.js
+
+      - name: Configure Git user
+        run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+
+      - name: Run release-it
+        run: npx release-it --ci  # Exécute release-it en mode CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_RELEASE }}  # Utilise le token GitHub pour effectuer la release
