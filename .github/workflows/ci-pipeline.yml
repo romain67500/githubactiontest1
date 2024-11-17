@@ -81,3 +81,17 @@ jobs:
         run: npx release-it --ci  # Exécute release-it en mode CI
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_RELEASE }}  # Utilise le token GitHub pour effectuer la release
+
+  only-canary:
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de validation
+    needs: install  # Cette étape attend la fin de l'étape "install"
+    if: ${{ env.ENV_TARGET == 'canary' }}  # Ce job ne s'exécute que si la variable ENV_TARGET est égale à "canary"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Récupère le code pour préparer le test
+
+      - name: Run Only Canary Job
+        run: echo "Hello Only Canary !"  # Affiche "Hello Only Canary !" comme placeholder pour ce job
+
+    env:
+      ENV_TARGET: ${{ secrets.ENV_TARGET }}  # Récupère la variable d'environnement ENV_TARGET depuis les secrets GitHub
