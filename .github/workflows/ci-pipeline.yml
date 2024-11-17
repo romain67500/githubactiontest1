@@ -4,35 +4,35 @@ on:
   push:
     branches:
       - main  # Déclenche l'action sur des pushs vers la branche principale
-    tags:
-      - '*'  # Déclenche l'action lors de la création de n'importe quel tag
   pull_request:
     branches:
       - main  # Déclenche l'action lors de la création d'une pull request vers la branche principale
+
+# Définition des ancres
+defaults: &defaults
+  - name: Checkout repository
+    uses: actions/checkout@v3  # Récupère le code du repository
+
+  - name: Set up Node.js
+    uses: actions/setup-node@v3  # Configure Node.js
+    with:
+      node-version: '16'  # Choix de la version de Node.js
+
+  - name: Install dependencies
+    run: npm ci --cache .npm --prefer-offline  # Utilise npm ci pour installer les dépendances avec un cache
 
 jobs:
   install:
     runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère le code du repository
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3  # Configure Node.js
-        with:
-          node-version: '16'  # Choix de la version de Node.js
-
-      - name: Install dependencies
-        run: npm ci --cache .npm --prefer-offline  # Utilise npm ci pour installer les dépendances avec un cache
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
 
   lint:
     runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de lint
     needs: install  # L'étape "lint" attend la fin de l'étape "install"
     if: ${{ github.ref != 'refs/tags/*' && !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
-
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
       - name: Lint code (ESLint)
         run: npm run lint  # Exécute la commande "npm run lint" définie dans package.json
 
@@ -41,9 +41,7 @@ jobs:
     needs: install  # L'étape "unit-test" attend la fin de l'étape "install"
     if: ${{ github.ref != 'refs/tags/*' && !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
-
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
       - name: Run unit tests with Vitest
         run: npm test  # Exécute la commande "npm test" pour lancer les tests avec Vitest
 
@@ -52,9 +50,7 @@ jobs:
     needs: unit-test  # L'étape "integration-test" attend la fin de l'étape "unit-test"
     if: ${{ github.ref != 'refs/tags/*' && !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
-
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
       - name: Run integration test (placeholder)
         run: echo "Hello Integration !"  # Affiche "Hello Integration !" comme placeholder pour les tests d'intégration
 
@@ -63,9 +59,7 @@ jobs:
     needs: integration-test  # L'étape "e2e-test" attend la fin de l'étape "integration-test"
     if: ${{ github.event_name == 'pull_request' }}  # Ce job s'exécute uniquement pour les Pull Requests
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
-
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
       - name: Run E2E test (placeholder)
         run: echo "Hello E2E !"  # Affiche "Hello E2E !" comme placeholder pour les tests E2E
 
@@ -76,14 +70,7 @@ jobs:
             github.event.head_commit.message != null &&
             !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère le code pour préparer la release
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3  # Configure Node.js
-        with:
-          node-version: '16'  # Choix de la version de Node.js
-
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
       - name: Configure Git user
         run: |
           git config user.email "${{ github.actor }}@users.noreply.github.com"
@@ -99,9 +86,7 @@ jobs:
     needs: install  # Cette étape attend la fin de l'étape "install"
     if: ${{ env.ENV_TARGET == 'canary' }}  # Ce job ne s'exécute que si la variable ENV_TARGET est égale à "canary"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère le code pour préparer le test
-
+      <<: *defaults  # Hérite de la configuration définie dans l'ancre "defaults"
       - name: Run Only Canary Job
         run: echo "Hello Only Canary !"  # Affiche "Hello Only Canary !" comme placeholder pour ce job
 
