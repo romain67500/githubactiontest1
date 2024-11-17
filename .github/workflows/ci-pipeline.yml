@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # Déclenche l'action sur des pushs vers la branche principale
+    tags:
+      - '*'  # Déclenche l'action lors de la création de n'importe quel tag
   pull_request:
     branches:
       - main  # Déclenche l'action lors de la création d'une pull request vers la branche principale
@@ -26,6 +28,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de lint
     needs: install  # L'étape "lint" attend la fin de l'étape "install"
+    if: ${{ github.ref != 'refs/tags/*' && !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
@@ -36,6 +39,7 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de tests
     needs: install  # L'étape "unit-test" attend la fin de l'étape "install"
+    if: ${{ github.ref != 'refs/tags/*' && !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
