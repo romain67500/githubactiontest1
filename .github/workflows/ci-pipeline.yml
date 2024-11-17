@@ -47,6 +47,16 @@ jobs:
       - name: Run unit tests with Vitest
         run: npm test  # Exécute la commande "npm test" pour lancer les tests avec Vitest
 
+  e2e-test:
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape E2E
+    if: ${{ github.event_name == 'pull_request' }}  # Ce job s'exécute uniquement pour les Pull Requests
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Récupère le code pour préparer le test
+
+      - name: Run E2E test (placeholder)
+        run: echo "Hello E2E !"  # Affiche "Hello E2E !" comme placeholder pour les tests E2E
+
   release:
     runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de release
     needs: [lint, unit-test]  # Cette étape attend la fin des étapes "lint" et "unit-test"
