@@ -46,7 +46,9 @@ jobs:
   release:
     runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de release
     needs: [lint, unit-test]  # Cette étape attend la fin des étapes "lint" et "unit-test"
-    if: ${{ github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'chore: release') }}
+    if: ${{ github.ref == 'refs/heads/main' &&
+            github.event.head_commit.message != null &&
+            !contains(github.event.head_commit.message, 'chore: release') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3  # Récupère le code pour préparer la release
