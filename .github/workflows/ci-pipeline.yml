@@ -47,12 +47,24 @@ jobs:
       - name: Run unit tests with Vitest
         run: npm test  # Exécute la commande "npm test" pour lancer les tests avec Vitest
 
+  integration-test:
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de tests d'intégration
+    needs: unit-test  # L'étape "integration-test" attend la fin de l'étape "unit-test"
+    if: ${{ github.ref != 'refs/tags/*' && !contains(github.event.head_commit.message, 'chore: release') }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
+
+      - name: Run integration test (placeholder)
+        run: echo "Hello Integration !"  # Affiche "Hello Integration !" comme placeholder pour les tests d'intégration
+
   e2e-test:
-    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape E2E
+    runs-on: ubuntu-latest  # Utilisation d'une machine virtuelle Ubuntu pour l'étape de tests E2E
+    needs: integration-test  # L'étape "e2e-test" attend la fin de l'étape "integration-test"
     if: ${{ github.event_name == 'pull_request' }}  # Ce job s'exécute uniquement pour les Pull Requests
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Récupère le code pour préparer le test
+        uses: actions/checkout@v3  # Récupère de nouveau le code du repository pour l'étape suivante
 
       - name: Run E2E test (placeholder)
         run: echo "Hello E2E !"  # Affiche "Hello E2E !" comme placeholder pour les tests E2E
